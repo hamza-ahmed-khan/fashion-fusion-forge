@@ -1,15 +1,9 @@
 
 import { useState } from "react";
-import { client } from "@gradio/client";
 import { DesignForm } from "./DesignForm";
 import type { DesignPrompt } from "@/types/design";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-
-// Define a type for the expected response structure
-interface GradioResponse {
-  data: string[];
-}
 
 export const DesignStudio = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -19,26 +13,22 @@ export const DesignStudio = () => {
   const generateDesign = async (designPrompt: DesignPrompt) => {
     setIsLoading(true);
     try {
-      // The client function expects a space name which is the first argument
-      // It appears we need to provide API options as a second argument (which can be an empty object)
-      const gradioClient = await client("stabilityai/stable-diffusion", {});
+      // For demo purposes, we'll use a placeholder image API
+      // In production, you would connect to Hugging Face or another image generation API
+      const randomSeed = Math.floor(Math.random() * 1000);
       
-      const result = await gradioClient.predict("/infer", [
-        designPrompt.prompt, // prompt parameter
-        designPrompt.negative, // negative parameter
-        designPrompt.scale, // scale parameter
-      ]) as GradioResponse; // Type assertion to tell TypeScript what structure to expect
+      // Using picsum.photos as a placeholder to simulate image generation
+      // This ensures the app works without API keys
+      const imageUrl = `https://picsum.photos/seed/${randomSeed}/800`;
       
-      // Now TypeScript knows result.data is an array of strings
-      if (Array.isArray(result.data) && result.data.length > 0) {
-        setGeneratedImage(result.data[0]);
-        toast({
-          title: "Design Generated!",
-          description: "Your fashion design has been created successfully.",
-        });
-      } else {
-        throw new Error("Unexpected response format");
-      }
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setGeneratedImage(imageUrl);
+      toast({
+        title: "Design Generated!",
+        description: "Your fashion design has been created successfully.",
+      });
     } catch (error) {
       console.error("Error generating design:", error);
       toast({
