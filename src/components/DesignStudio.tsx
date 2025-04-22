@@ -14,18 +14,26 @@ export const DesignStudio = () => {
   const generateDesign = async (designPrompt: DesignPrompt) => {
     setIsLoading(true);
     try {
-      const gradioClient = await client("stabilityai/stable-diffusion");
-      const result = await gradioClient.predict("/infer", {
-        prompt: designPrompt.prompt,
-        negative: designPrompt.negative,
-        scale: designPrompt.scale,
-      });
+      // The client function expects a space name which is the first argument
+      // It appears we need to provide API options as a second argument (which can be an empty object)
+      const gradioClient = await client("stabilityai/stable-diffusion", {});
       
-      setGeneratedImage(result.data[0]);
-      toast({
-        title: "Design Generated!",
-        description: "Your fashion design has been created successfully.",
-      });
+      const result = await gradioClient.predict("/infer", [
+        designPrompt.prompt, // prompt parameter
+        designPrompt.negative, // negative parameter
+        designPrompt.scale, // scale parameter
+      ]);
+      
+      // Assuming result is an array where the first item contains the generated image
+      if (Array.isArray(result.data) && result.data.length > 0) {
+        setGeneratedImage(result.data[0]);
+        toast({
+          title: "Design Generated!",
+          description: "Your fashion design has been created successfully.",
+        });
+      } else {
+        throw new Error("Unexpected response format");
+      }
     } catch (error) {
       console.error("Error generating design:", error);
       toast({
