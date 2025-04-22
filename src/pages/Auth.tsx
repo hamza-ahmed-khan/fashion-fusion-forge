@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,24 +15,29 @@ export const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
       const { error } = isSignUp 
         ? await supabase.auth.signUp({ email, password })
         : await supabase.auth.signInWithPassword({ email, password });
-
+  
       if (error) throw error;
-
+  
       toast({
         title: isSignUp ? "Account created!" : "Welcome back!",
         description: isSignUp 
           ? "Please check your email to verify your account." 
           : "You have been successfully logged in.",
       });
+  
+      if (!isSignUp) {
+        navigate("/");
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -42,6 +48,7 @@ export const Auth = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white p-6">
