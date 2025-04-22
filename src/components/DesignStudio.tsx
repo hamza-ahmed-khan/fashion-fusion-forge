@@ -6,6 +6,11 @@ import type { DesignPrompt } from "@/types/design";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 
+// Define a type for the expected response structure
+interface GradioResponse {
+  data: string[];
+}
+
 export const DesignStudio = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,9 +27,9 @@ export const DesignStudio = () => {
         designPrompt.prompt, // prompt parameter
         designPrompt.negative, // negative parameter
         designPrompt.scale, // scale parameter
-      ]);
+      ]) as GradioResponse; // Type assertion to tell TypeScript what structure to expect
       
-      // Assuming result is an array where the first item contains the generated image
+      // Now TypeScript knows result.data is an array of strings
       if (Array.isArray(result.data) && result.data.length > 0) {
         setGeneratedImage(result.data[0]);
         toast({
