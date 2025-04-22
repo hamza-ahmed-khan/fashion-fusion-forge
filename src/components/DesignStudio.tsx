@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Client } from "@gradio/client";
+import { client } from "@gradio/client";
 import { DesignForm } from "./DesignForm";
 import type { DesignPrompt } from "@/types/design";
 import { useToast } from "@/hooks/use-toast";
@@ -14,8 +14,8 @@ export const DesignStudio = () => {
   const generateDesign = async (designPrompt: DesignPrompt) => {
     setIsLoading(true);
     try {
-      const client = await Client.connect("stabilityai/stable-diffusion");
-      const result = await client.predict("/infer", {
+      const gradioClient = await client("stabilityai/stable-diffusion");
+      const result = await gradioClient.predict("/infer", {
         prompt: designPrompt.prompt,
         negative: designPrompt.negative,
         scale: designPrompt.scale,
