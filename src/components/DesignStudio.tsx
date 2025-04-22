@@ -17,7 +17,18 @@ export const DesignStudio = () => {
     setIsLoading(true);
     try {
       const randomSeed = Math.floor(Math.random() * 1000);
-      const imageUrl = `https://picsum.photos/seed/${randomSeed}/800`;
+      const res = await fetch("/api/generate-design", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: designPrompt.prompt })
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.message || "Generation failed");
+      
+      const imageUrl = data.image;
+      
       
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
