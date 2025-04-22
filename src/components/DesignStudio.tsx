@@ -4,25 +4,37 @@ import { DesignForm } from "./DesignForm";
 import type { DesignPrompt } from "@/types/design";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./AuthProvider";
 
 export const DesignStudio = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const generateDesign = async (designPrompt: DesignPrompt) => {
     setIsLoading(true);
     try {
-      // For demo purposes, we'll use a placeholder image API
-      // In production, you would connect to Hugging Face or another image generation API
       const randomSeed = Math.floor(Math.random() * 1000);
-      
-      // Using picsum.photos as a placeholder to simulate image generation
-      // This ensures the app works without API keys
       const imageUrl = `https://picsum.photos/seed/${randomSeed}/800`;
       
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Store the design in the database
+      const { error } = await supabase
+        .from('designs')
+        .insert({
+          user_id: user?.id,
+          prompt: designPrompt.prompt,
+          negative_prompt: designPrompt.negative,
+          scale: designPrompt.scale,
+          category: designPrompt.category,
+          image_url: imageUrl
+        });
+
+      if (error) throw error;
       
       setGeneratedImage(imageUrl);
       toast({
